@@ -9,6 +9,9 @@ target 'TOEX' do
     pod 'Hero'
 	pod 'AMScrollingNavbar'
 	pod 'SDWebImage', '~> 4.0'
+  	pod 'GoogleMaps'
+  	pod 'GooglePlaces'
+    pod 'GooglePlacePicker'
   # Pods for TOEX
 
 end
