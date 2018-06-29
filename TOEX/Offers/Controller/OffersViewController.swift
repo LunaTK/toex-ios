@@ -21,24 +21,23 @@ class OffersViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        setupTableView()
         tabBar.delegate = self
+        
+        offers.updateDelegate = { [weak tableView] in
+            tableView?.reloadData()
+            self.isFetchingMore = false
+        }
+    }
+
+    private func setupTableView(){
         tableView.delegate = self
         tableView.dataSource = self
         
-        offers.updateDelegate = {
-            [weak tableView] in
-            tableView?.reloadData()
-//            tableView?.reloadSections(IndexSet(integer: 0), with: .none)
-            self.isFetchingMore = false
-        }
-        
-        // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        //bottom inset
+        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: -15, right: 0)
+        //remove last separator
+        tableView.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 1))
     }
     
 
@@ -56,37 +55,31 @@ class OffersViewController: UIViewController {
 
 extension OffersViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return offers.count
+        return section==0 ? offers.count : 1
     }
     
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "default cell", for: indexPath)
-        cell.textLabel?.text = offers[indexPath.item]?.title
-//        cell.detailTextLabel?.text = offers[indexPath.item]?.description
+        let cellIdentifier = [0:"offer cell", 1:"loading cell"]
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier[indexPath.section]!, for: indexPath)
+        
+        if indexPath.section == 0 {
+            cell.textLabel?.text = offers[indexPath.item]?.title
+        }
         return cell
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.item == (offers.count - 1) {
-//            offers.loadNextPage()
+            if !isFetchingMore {
+                isFetchingMore = true
+                offers.loadNextPage()
+            }
         }
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        
-        if offsetY > contentHeight - scrollView.frame.height {
-            if !isFetchingMore {
-                isFetchingMore = true
-//                tableView.reloadSections(IndexSet(integer: 0), with: .none)
-                offers.loadNextPage()
-            }
-        }
+        return 2
     }
 }
 
