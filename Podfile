@@ -7,7 +7,8 @@ target 'TOEX' do
 
     pod 'Alamofire', '~> 4.7'
     pod 'Hero'
-
+	pod 'AMScrollingNavbar'
+	pod 'SDWebImage', '~> 4.0'
   # Pods for TOEX
 
 end
