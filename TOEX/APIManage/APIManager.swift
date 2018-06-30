@@ -10,19 +10,18 @@ import Foundation
 import Alamofire
 
 class APIManager{
-    class func testRequest(){
-        
-        Alamofire.request("http://121.189.179.92:8000/dealslist/", method: .get).responseJSON { response in
-            let data = response.data
-            let jsonstr = try! JSONSerialization.jsonObject(with: response.data!, options: [])
-            print(jsonstr)
-            
-            if let data = response.data, let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                
-//                debugPrint(json)
+    class func getOfferList(from location: Location, completion: @escaping (_ data: Dictionary<String, Any>)->Void){
+        let url = "http://121.189.179.92:8000/getdistance/?lat=\(location.latitude)&lon=\(location.longtitude)"
+        Alamofire.request(url, method: .get).responseJSON { response in
+            switch response.result {
+            case .success:
+                if let result = response.result.value as? Dictionary<String, Any> {
+//                    print(result)
+                    completion(result)
+                }
+            case .failure(let error):
+                print(error)
             }
-            
-            
         }
     }
 }
