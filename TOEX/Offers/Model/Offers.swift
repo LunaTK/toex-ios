@@ -32,24 +32,24 @@ class Offers{
     func loadNextPage(){
         print("load next page")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {[self] in
-            self.offers += Array(repeating: Offer(title: "title \(self.generateCounter)", description: "description"), count: 15)
-            self.generateCounter += 1
-            self.updateDelegate?()
+            APIManager.getOfferList(from: Location(latitude: 127, longtitude: 64), completion: { (data) in
+                if let dict = data["distance"] as? Dictionary<String, Any>{
+                    dict.forEach({ (index, offerAny) in
+                        if let offerDict = offerAny as? Dictionary<String, Any>{
+                            offerDict.forEach({ (distance, offerItem) in
+                                
+                                let offer = Offer(distance: Double(distance)!, with: offerItem as! Dictionary<String, Any>)
+                                self.offers.append(offer)
+                                print("ff")
+                                
+                            })
+                        }
+                    })
+                }
+                self.updateDelegate?()
+            })
         }
     }
 }
 
-class Offer{
-    enum Kind {
-        case buy
-        case sell
-    }
-    
-    var title: String
-    var description: String
-    
-    init(title: String, description: String){
-        self.title = title
-        self.description = description
-    }
-}
+

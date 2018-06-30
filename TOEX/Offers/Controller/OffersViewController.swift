@@ -62,10 +62,6 @@ class OffersViewController: UIViewController {
         currentTab = .provide
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        print("\(provideTab.frame)")
-    }
-    
     private func setupNavigationBar(){
         if let navigationController = navigationController as? ScrollingNavigationController {
             navigationController.followScrollView(tableView, delay: 0, scrollSpeedFactor: 1.0, collapseDirection: .scrollUp, followers: [])
@@ -87,6 +83,7 @@ class OffersViewController: UIViewController {
     @IBAction func handlePriceFilter(_ sender: Any) {
         let center = CGPoint(x: view.frame.maxX * 0.9, y: popupReferenceView.frame.height + 40)
         showFilterPopup(at: center, from: CGPoint(x: 0.9, y: 0.0))
+        filterPopup?.currencyUnit = .JPY
     }
     
     @IBAction func handleTabChange(_ sender: UITapGestureRecognizer) {
@@ -103,6 +100,7 @@ class OffersViewController: UIViewController {
         popup.center = center
         popup.rangeSlider.delegate = self
         popup.animateAppearing(from: anchor)
+
     }
     
     private func dismissFilterPopup(){
@@ -121,25 +119,33 @@ class OffersViewController: UIViewController {
         tableView.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 1))
     }
     
-
-    /*
+    @IBAction func menu(_ sender: Any) {
+        KOSessionTask.unlinkTask { (success, error) in
+            print(success)
+        }
+    }
+    
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        if let offerDetailVC = segue.destination as? OfferDetailViewController{
+            offerDetailVC.offer = sender as! Offer
+        }
     }
-    */
+ 
 
 }
 
 extension OffersViewController: RangeSliderDelegate{
     func rangeSlider(_ rangeSlider: RangeSlider, didChangeLowerValue lowerValue: Double) {
-        filterPopup?.minLabel.text = "\(Int(lowerValue))"
+        filterPopup?.lowerValue = lowerValue
     }
     func rangeSlider(_ rangeSlider: RangeSlider, didChangeUpperValue upperValue: Double) {
-        filterPopup?.minLabel.text = "\(Int(upperValue))"
+        filterPopup?.upperValue = upperValue
     }
 }
 
@@ -154,8 +160,14 @@ extension OffersViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier[indexPath.section]!, for: indexPath)
         
         if let offerCell = cell as? OfferTableViewCell{
-//            offerCell.usernameLabel.text = "hhhh"
+            let offer = offers[indexPath.item]!
+            offerCell.usernameLabel.text = offer.offerer.username
+            offerCell.distanceLabel.text = "\(Int(offer.distance))km"
+            offerCell.provideLabel.text = "\(offer.provide.value)\(offer.provide.unit.character)"
+            let rate = Double(offer.recieve.value) /  Double(offer.provide.value)
+            offerCell.rateLabel.text = "1\(offer.provide.unit.character) = \(Int(rate))\(offer.recieve.unit.character)"
         }
+        
         return cell
     }
     
@@ -165,6 +177,12 @@ extension OffersViewController: UITableViewDelegate, UITableViewDataSource {
                 isFetchingMore = true
                 offers.loadNextPage()
             }
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let offer = offers[indexPath.item], indexPath.section==0 {
+        performSegue(withIdentifier: "show offer detail", sender: offer)
         }
     }
     

@@ -13,6 +13,8 @@ class OfferTableViewCell: UITableViewCell {
     @IBOutlet weak var profileImageView: UIImageView!
     @IBOutlet weak var usernameLabel: UILabel!
     @IBOutlet weak var distanceLabel: UILabel!
+    @IBOutlet weak var provideLabel: UILabel!
+    @IBOutlet weak var rateLabel: UILabel!
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

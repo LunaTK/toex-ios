@@ -18,13 +18,20 @@ class FilterPopup: UIView {
     @IBOutlet weak var rangeLabel: UILabel!
     @IBOutlet weak var minLabel: UILabel!
     @IBOutlet weak var maxLabel: UILabel!
-    var currencyUnit: Currency.Unit?
-    
-    var handleCancel: (()->Void)?{
+    var currencyUnit: Currency.Unit?{
         didSet{
-            
+            maxValue = 10000
+            rangeSlider.maximumValue = 10000
+            rangeSlider.upperValue = 5000
+            rangeSlider.minimumValue = 1000
+            rangeSlider.lowerValue = 1000
+            upperValue = 5000
+            lowerValue = 1000
+            updateRangeDisplay()
         }
     }
+    
+    var handleCancel: (()->Void)?
     
     var minValue: Double {
         get{
@@ -46,28 +53,27 @@ class FilterPopup: UIView {
         }
     }
     
-    var lowerValue: Double{
-        get{
-            return rangeSlider.lowerValue
-        }
-        set{
-            rangeSlider.lowerValue = newValue
+    var lowerValue: Double = 0{
+        didSet{
+//            rangeSlider.lowerValue = lowerValue
             updateRangeDisplay()
         }
     }
     
-    var upperValue: Double{
-        get{
-            return rangeSlider.upperValue
-        }
-        set{
-            rangeSlider.upperValue = newValue
+    var upperValue: Double = 100{
+        didSet{
+//            rangeSlider.upperValue = upperValue
             updateRangeDisplay()
         }
+    }
+    
+    override func awakeFromNib() {
+        updateRangeDisplay()
     }
     
     private func updateRangeDisplay(){
-        rangeLabel?.text = "\(Int(lowerValue))"
+        let unit: String = currencyUnit == nil ? "km" : String(currencyUnit!.character)
+        rangeLabel?.text = "\(Int(lowerValue))\(unit) ~ \(Int(upperValue))\(unit)"
     }
     
     @IBAction func handleCancel(_ sender: Any) {

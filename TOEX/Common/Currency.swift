@@ -38,4 +38,11 @@ class Currency{
             }
         }
     }
+    var value: Int
+    var unit: Unit
+    
+    init(value: Int, unit: Unit){
+        self.value = value
+        self.unit = unit
+    }
 }

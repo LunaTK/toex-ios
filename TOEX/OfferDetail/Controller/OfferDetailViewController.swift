@@ -7,21 +7,61 @@
 //
 
 import UIKit
+import GoogleMaps
 
 class OfferDetailViewController: UIViewController {
 
+    @IBOutlet weak var profileImageView: UIImageView!
+    @IBOutlet weak var usernameLabel: UILabel!
+    @IBOutlet weak var locationLabel: UILabel!
+    @IBOutlet weak var provideLabel: UILabel!
+    @IBOutlet weak var recieveLabel: UILabel!
+    @IBOutlet weak var mapContainer: UIView!
+    @IBOutlet weak var kakaotalkIDButton: UIButton!
+    
+    var offer: Offer?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        navigationItem.titleView = UIImageView(image: #imageLiteral(resourceName: "TOEX"))
         // Do any additional setup after loading the view.
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    private func displayOffer(){
+        guard offer != nil else {return}
+        usernameLabel.text = offer!.offerer.username!
+        provideLabel.text = "\(offer!.provide.value)\(offer!.provide.unit.character)"
+        recieveLabel.text = "\(offer!.recieve.value)\(offer!.recieve.unit.character)"
+        kakaotalkIDButton.titleLabel?.text = offer!.offerer.kakaoid!
+        locationLabel.text = offer!.place
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        setupProfileImage()
+        displayOffer()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        setupMapView()
+    }
 
+    private func setupProfileImage(){
+        profileImageView.layer.cornerRadius = profileImageView.frame.height/2
+    }
+
+    private func setupMapView(){
+        let location = offer!.location
+        let camera = GMSCameraPosition.camera(withLatitude: location.latitude, longitude: location.longtitude, zoom: 15.0)
+        let mapView = GMSMapView.map(withFrame: mapContainer.bounds, camera: camera)
+        
+        mapContainer.addSubview(mapView)
+        let position = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longtitude)
+        let marker = GMSMarker(position: position)
+        marker.title = "Hello World"
+        marker.map = mapView
+        
+    }
+    
     /*
     // MARK: - Navigation
 
