@@ -36,13 +36,10 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func handleLogout(_ sender: Any) {
-        KOSessionTask.unlinkTask { (success, error) in
-            print(success)
-        }
     }
     
     @IBAction func handleReq(_ sender: Any) {
-        APIManager.testRequest()
+        
     }
     
     /*
